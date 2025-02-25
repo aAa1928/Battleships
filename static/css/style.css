@@ -10,6 +10,7 @@ body {
   display: flex;
   gap: 40px;
   margin: 20px;
+  align-items: flex-start;
 }
 
 .grid {
@@ -37,6 +38,16 @@ h1 {
 }
 
 #target-grid,
-#ocean-grid {
+#ocean-grid,
+#ships-container {
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h2 {
+  margin-bottom: 15px;
+  color: #333;
+  text-align: center;
 }

@@ -29,6 +29,7 @@
     <h1>Battleships</h1>
     <div class="container">
       <div id="target-grid">
+        <h2>Target Grid</h2>
         <table class="grid">
           <tr class="header-row">
             <td class="corner"></td>
@@ -176,6 +177,7 @@
         </table>
       </div>
       <div id="ocean-grid">
+        <h2>Ocean Grid</h2>
         <table class="grid">
           <tr class="header-row">
             <td class="corner"></td>
@@ -321,6 +323,29 @@
             <td></td>
           </tr>
         </table>
+      </div>
+      <div id="ships-container">
+        <h2>Ships</h2>
+        <div class="ship carrier" draggable="true" data-ship-length="5">
+          <div class="ship-preview">◼◼◼◼◼</div>
+          <p>Carrier (5)</p>
+        </div>
+        <div class="ship battleship" draggable="true" data-ship-length="4">
+          <div class="ship-preview">◼◼◼◼</div>
+          <p>Battleship (4)</p>
+        </div>
+        <div class="ship cruiser" draggable="true" data-ship-length="3">
+          <div class="ship-preview">◼◼◼</div>
+          <p>Cruiser (3)</p>
+        </div>
+        <div class="ship submarine" draggable="true" data-ship-length="3">
+          <div class="ship-preview">◼◼◼</div>
+          <p>Submarine (3)</p>
+        </div>
+        <div class="ship destroyer" draggable="true" data-ship-length="2">
+          <div class="ship-preview">◼◼</div>
+          <p>Destroyer (2)</p>
+        </div>
       </div>
     </div>
     <footer><p>Created by Risheet Lenka</p></footer>

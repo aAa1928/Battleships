@@ -3,6 +3,7 @@ from enum import Enum
 
 Coord = namedtuple('Point', ['x', 'y'])
 
+
 class ShipType(Enum):
     CARRIER = 5
     BATTLESHIP = 4
@@ -10,9 +11,11 @@ class ShipType(Enum):
     SUBMARINE = 3
     DESTROYER = 2
 
+
 class Orientation(Enum):
     HORIZONTAL = 1
     VERTICAL = 2
+
 
 class Ship():
     def __init__(self, type: ShipType, coord: Coord = None, orientation: Orientation = None):
@@ -35,3 +38,8 @@ class Ship():
 
         self.hits = 0
         self.orientation = orientation
+
+
+class Player:
+    def __init__(self):
+        self.grid = [[0 for _ in range(10)] for _ in range(10)]
