@@ -3,6 +3,11 @@ from enum import Enum
 
 Coord = namedtuple('Point', ['x', 'y'])
 
+class GameState(Enum):
+    WAITING_FOR_PLAYERS = 1
+    PLACING_SHIPS = 2
+    PLAYING = 3
+    GAME_OVER = 4
 
 class ShipType(Enum):
     CARRIER = 5
@@ -53,5 +58,7 @@ class Player:
         grid (list of list of int): A 10x10 2D array representing the player's game board
     '''
     def __init__(self):
-        self.grid = [[0 for _ in range(10)] for _ in range(10)]
+        self.ocean_grid = [[0 for _ in range(10)] for _ in range(10)]
+        self.placed_ships = []
+        self.unplaced_ships = []
 
