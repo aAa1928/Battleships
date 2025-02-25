@@ -41,5 +41,17 @@ class Ship():
 
 
 class Player:
+    '''
+    A class representing a player in the Battleships game.
+    The player has a 10x10 grid where ships can be placed and shots can be tracked.
+    The grid uses the following representation:
+        0: Empty space
+        1: Ship
+        2: Hit ship
+        -1: Missed shot (hit on empty space)
+    Attributes:
+        grid (list of list of int): A 10x10 2D array representing the player's game board
+    '''
     def __init__(self):
         self.grid = [[0 for _ in range(10)] for _ in range(10)]
+
