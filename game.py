@@ -23,7 +23,7 @@ class Orientation(Enum):
 
 
 class Ship():
-    def __init__(self, type: ShipType, coord: Coord = None, orientation: Orientation = None):
+    def __init__(self, type: ShipType, coord: Coord = None, orientation: Orientation = Orientation.HORIZONTAL):
         self.coord = coord
         self.type = type
 
@@ -60,5 +60,17 @@ class Player:
     def __init__(self):
         self.ocean_grid = [[0 for _ in range(10)] for _ in range(10)]
         self.placed_ships = []
-        self.unplaced_ships = []
+        self.unplaced_ships = [Ship(ShipType.CARRIER), 
+                               Ship(ShipType.BATTLESHIP), 
+                               Ship(ShipType.CRUISER), 
+                               Ship(ShipType.SUBMARINE), 
+                               Ship(ShipType.DESTROYER)]
+        
+
+class Game:
+    def __init__(self):
+        self.state = GameState.WAITING_FOR_PLAYERS
+        self.players = [Player(), Player()]
+        self.turn = 0
+        self.current_player = 0
 
