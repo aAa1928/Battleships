@@ -57,3 +57,15 @@ h2 {
   color: #333;
   text-align: center;
 }
+
+.ship {
+  background-color: #808080 !important;
+}
+
+.hit {
+  background-color: #ff0000 !important;
+}
+
+.miss {
+  background-color: #ffffff !important;
+}
