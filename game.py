@@ -78,5 +78,5 @@ class Game:
         self.players = Player(), Computer()
         self.player, self.opponent = self.players
         self.turn = cycle(self.players)
-        self.current_player = 0
+        self.current_player = next(self.turn)
 
