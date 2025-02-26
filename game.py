@@ -1,5 +1,7 @@
 from collections import namedtuple
 from enum import Enum
+from itertools import cycle
+from random import randint
 
 Coord = namedtuple('Point', ['x', 'y'])
 
@@ -66,11 +68,15 @@ class Player:
                                Ship(ShipType.SUBMARINE), 
                                Ship(ShipType.DESTROYER)]
         
+class Computer(Player):
+    def __init__(self):
+        super().__init__()
 
 class Game:
     def __init__(self):
-        self.state = GameState.WAITING_FOR_PLAYERS
-        self.players = [Player(), Player()]
-        self.turn = 0
+        self.state = GameState.PLACING_SHIPS
+        self.players = Player(), Computer()
+        self.player, self.opponent = self.players
+        self.turn = cycle(self.players)
         self.current_player = 0
 
