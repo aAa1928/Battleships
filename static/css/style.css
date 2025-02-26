@@ -15,7 +15,13 @@ body {
 
 .grid {
   border-collapse: collapse;
-  background-color: #fff;
+  background-color: #bccfe7;
+}
+
+.grid tr:first-child td,
+.grid td:first-child {
+  background-color: black;
+  color: white;
 }
 
 .grid td {
