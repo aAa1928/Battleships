@@ -60,6 +60,26 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedShip = null;
 
   shipElements.forEach((shipElement) => {
+    // Add right-click handler for orientation toggle
+    shipElement.addEventListener("contextmenu", (e) => {
+      e.preventDefault(); // Prevent context menu from showing
+
+      const ship = ships.find((s) => s.element === shipElement);
+      const orientationIndicator = shipElement.querySelector(
+        ".orientation-indicator"
+      );
+
+      if (ship.orientation === "horizontal") {
+        ship.orientation = "vertical";
+        orientationIndicator.innerHTML = shipOrientation.VERTICAL;
+      } else {
+        ship.orientation = "horizontal";
+        orientationIndicator.innerHTML = shipOrientation.HORIZONTAL;
+      }
+
+      console.log(`${ship.type} orientation changed to ${ship.orientation}`);
+    });
+
     shipElement.addEventListener("click", () => {
       selectedShip = ships.find((ship) => ship.element === shipElement);
       console.log("Selected ship:", selectedShip);
