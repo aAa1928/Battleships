@@ -51,6 +51,25 @@ class Ship():
 
     def place(self):
         raise NotImplementedError()
+    
+    @staticmethod
+    def convert_grid_coord(grid_coord: str) -> Coord:
+        """Convert grid coordinates (e.g., 'A1') to Coord object (e.g., Coord(1, 1))"""
+        if not grid_coord or len(grid_coord) < 2:
+            raise ValueError("Invalid grid coordinate")
+        letter = grid_coord[0].upper()
+        number = int(grid_coord[1:])
+        if not ('A' <= letter <= 'J') or not (1 <= number <= 10):
+            raise ValueError("Coordinate out of bounds")
+        return Coord(number, ord(letter) - ord('A') + 1)
+
+    @staticmethod
+    def convert_to_grid_coord(coord: Coord) -> str:
+        """Convert Coord object (e.g., Coord(1, 1)) to grid coordinates (e.g., 'A1')"""
+        if not (1 <= coord.x <= 10) or not (1 <= coord.y <= 10):
+            raise ValueError("Coordinate out of bounds")
+        letter = chr(ord('A') + coord.y - 1)
+        return f"{letter}{coord.x}"
 
 class Player:
     '''
