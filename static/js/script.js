@@ -57,6 +57,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function placeShip(ship) {
+    // Logic to place the ship on the grid
+  }
+
+  function validateShipPlacement() {
+    // Logic to validate ship placement
+  }
+
   let selectedShip = null;
 
   shipElements.forEach((shipElement) => {
@@ -101,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ships.splice(index, 1);
         selectedShip.element.remove();
       }
+      placeShip(selectedShip);
 
       selectedShip = null;
     }

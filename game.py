@@ -28,6 +28,9 @@ class Orientation(Enum):
 
 
 class Ship():
+
+    ship_coordinates_all = []
+
     def __init__(self, type: ShipType, coord: Coord = None, orientation: Orientation = Orientation.HORIZONTAL):
         self.coord = coord
         self.type = type
