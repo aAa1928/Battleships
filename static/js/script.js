@@ -57,8 +57,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function placeShip(ship) {
-    // Logic to place the ship on the grid
+  function placeShip(ship, cell) {
+    // Send ship placement to server
+    fetch("/place-ship", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: ship.type,
+        position: cell.id,
+        orientation: ship.orientation,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Update UI
+          cell.classList.add("ship");
+          ship.placed = true;
+          ship.position = cell.id;
+
+          // Remove ship from selection
+          const index = ships.indexOf(ship);
+          if (index > -1) {
+            ships.splice(index, 1);
+            ship.element.remove();
+          }
+
+          // Update game state if returned
+          if (data.gameState) {
+            currentState = data.gameState;
+            updateUI();
+          }
+        } else {
+          console.error("Failed to place ship:", data.error);
+        }
+      })
+      .catch((error) => console.error("Error placing ship:", error));
   }
 
   function validateShipPlacement() {
@@ -97,20 +133,13 @@ document.addEventListener("DOMContentLoaded", () => {
   oceanGrid.addEventListener("click", (event) => {
     if (currentState === gameState.PLACING_SHIPS) {
       if (!selectedShip || !event.target.id) return;
+      if (
+        event.target.classList.contains("header-col") ||
+        event.target.classList.contains("corner")
+      )
+        return;
 
-      const cell = event.target;
-      cell.classList.add("ship");
-
-      selectedShip.placed = true;
-      selectedShip.position = cell.id;
-
-      const index = ships.indexOf(selectedShip);
-      if (index > -1) {
-        ships.splice(index, 1);
-        selectedShip.element.remove();
-      }
-      placeShip(selectedShip);
-
+      placeShip(selectedShip, event.target);
       selectedShip = null;
     }
   });
