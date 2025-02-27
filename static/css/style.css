@@ -79,3 +79,14 @@ h2 {
 .ships-list li {
   margin-bottom: 10px;
 }
+
+.orientation-indicator {
+  cursor: pointer;
+  margin-left: 8px;
+  user-select: none;
+  font-size: 1.2em;
+}
+
+.orientation-indicator:hover {
+  color: #4caf50;
+}
