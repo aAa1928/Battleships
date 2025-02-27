@@ -69,3 +69,13 @@ h2 {
 .miss {
   background-color: #ffffff !important;
 }
+
+.ships-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ships-list li {
+  margin-bottom: 10px;
+}

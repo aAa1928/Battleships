@@ -1,30 +1,45 @@
 "use strict";
 
+const shipsContainer = document.getElementById("ships-container");
+const oceanGrid = document.getElementById("ocean-grid");
+const targetGrid = document.getElementById("target-grid");
+
+const shipElements = Array.from(document.querySelectorAll(".ship"));
+
+const ships = shipElements.map((shipElement) => ({
+  element: shipElement,
+  type: shipElement.classList[1], // carrier, battleship, etc.
+  length: parseInt(shipElement.dataset.shipLength),
+  placed: false,
+  orientation: "horizontal",
+  position: null,
+}));
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Get initial game state
+  console.log("Ships:", ships);
+
   const gameState = {
+    ERROR: 0,
     WAITING_FOR_PLAYERS: 1,
     PLACING_SHIPS: 2,
     PLAYING: 3,
     GAME_OVER: 4,
   };
 
-  let currentState = 1; // Start with WAITING_FOR_PLAYERS state
+  let currentState = 1;
 
   function updateGameState() {
     fetch("/game-state")
       .then((response) => response.json())
       .then((data) => {
         currentState = data.state;
+        console.log(`Current State Updated: ${currentState}`); // Debug log
         updateUI();
-      });
+      })
+      .catch((error) => console.error("Error fetching game state:", error));
   }
 
   function updateUI() {
-    const shipsContainer = document.getElementById("ships-container");
-    const oceanGrid = document.getElementById("ocean-grid");
-    const targetGrid = document.getElementById("target-grid");
-
     switch (currentState) {
       case gameState.PLACING_SHIPS:
         shipsContainer.style.display = "block";
@@ -39,5 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Poll for state updates every few seconds
+  updateGameState();
   setInterval(updateGameState, 3000);
 });

@@ -10,11 +10,12 @@ game = None
 def initialize_game():
     global game
     if game is None:
-        game = Game()    
+        game = Game()  
+        print(game.state.value)  
 
 @app.route('/')
 def home():
-    print(game)
+    print(game.state.value)
     return render_template('index.html', game_state=game.state.value)
 
 @app.route('/game-state')

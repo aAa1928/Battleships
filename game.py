@@ -5,11 +5,14 @@ from random import randint
 
 Coord = namedtuple('Point', ['x', 'y'])
 
+
 class GameState(Enum):
+    ERROR = 0
     WAITING_FOR_PLAYERS = 1
     PLACING_SHIPS = 2
     PLAYING = 3
     GAME_OVER = 4
+
 
 class ShipType(Enum):
     CARRIER = 5
@@ -46,6 +49,8 @@ class Ship():
         self.hits = 0
         self.orientation = orientation
 
+    def place(self):
+        raise NotImplementedError()
 
 class Player:
     '''
@@ -67,10 +72,12 @@ class Player:
                                Ship(ShipType.CRUISER), 
                                Ship(ShipType.SUBMARINE), 
                                Ship(ShipType.DESTROYER)]
-        
+
+
 class Computer(Player):
     def __init__(self):
         super().__init__()
+
 
 class Game:
     def __init__(self):
