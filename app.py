@@ -31,11 +31,26 @@ def place_ship():
 
     try:
         # Update the game state with the placed ship
-        ship = Ship(ShipType[ship_type.upper()], position, Orientation[orientation.upper()])
+        print(ship_type, position, orientation)
+
+        position = Ship.convert_grid_coord(position)
+
+        match ship_type:
+            case 'carrier':
+                ship = Ship(ShipType.CARRIER, position, Orientation[orientation.upper()])
+            case 'battleship':
+                ship = Ship(ShipType.BATTLESHIP, position, Orientation[orientation.upper()])
+            case 'cruiser':
+                ship = Ship(ShipType.CRUISER, position, Orientation[orientation.upper()])
+            case 'submarine':
+                ship = Ship(ShipType.SUBMARINE, position, Orientation[orientation.upper()])
+            case 'destroyer':
+                ship = Ship(ShipType.DESTROYER, position, Orientation[orientation.upper()])
+
         game.player.place_ship(ship)
         
         # Check if all ships are placed
-        if all(ship.placed for ship in game.player.ships):
+        if all(ship.is_placed for ship in [*game.player.placed_ships, *game.player.unplaced_ships]):
             game.state = GameState.PLAYING
         
         return jsonify({

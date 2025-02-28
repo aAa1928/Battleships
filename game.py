@@ -51,10 +51,10 @@ class Ship():
 
         self.hits = 0
         self.orientation = orientation
-
-    def place(self):
-        raise NotImplementedError()
     
+    def is_placed(self):
+        return self.coord is not None
+
     @staticmethod
     def convert_grid_coord(grid_coord: str) -> Coord:
         """Convert grid coordinates (e.g., 'A1') to Coord object (e.g., Coord(1, 1))"""
@@ -89,11 +89,36 @@ class Player:
     def __init__(self):
         self.ocean_grid = [[0 for _ in range(10)] for _ in range(10)]
         self.placed_ships = []
-        self.unplaced_ships = [Ship(ShipType.CARRIER), 
-                               Ship(ShipType.BATTLESHIP), 
-                               Ship(ShipType.CRUISER), 
-                               Ship(ShipType.SUBMARINE), 
-                               Ship(ShipType.DESTROYER)]
+        
+        self.carrier = Ship(ShipType.CARRIER)
+        self.battleship = Ship(ShipType.BATTLESHIP)
+        self.cruiser = Ship(ShipType.CRUISER)
+        self.submarine = Ship(ShipType.SUBMARINE)
+        self.destroyer = Ship(ShipType.DESTROYER)
+
+        self.unplaced_ships = [self.carrier, 
+                               self.battleship, 
+                               self.cruiser, 
+                               self.submarine, 
+                               self.destroyer]
+
+    def place_ship(self, ship: Ship):
+        if ship.coord is None:
+            raise ValueError("Ship coordinates cannot be None")
+        if ship in self.unplaced_ships:
+            self.unplaced_ships.remove(ship)
+            self.placed_ships.append(ship)
+        
+        if ship.orientation == Orientation.HORIZONTAL:
+            for x in range(ship.coord.x, ship.coord.x + ship.size):
+                if x > 10:
+                    raise ValueError("Ship placement out of bounds")
+                self.ocean_grid[ship.coord.y - 1][x - 1] = 1
+        else:  # VERTICAL
+            for y in range(ship.coord.y, ship.coord.y + ship.size):
+                if y > 10:
+                    raise ValueError("Ship placement out of bounds")
+                self.ocean_grid[y - 1][ship.coord.x - 1] = 1
 
 
 class Computer(Player):
