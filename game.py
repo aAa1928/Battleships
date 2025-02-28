@@ -119,6 +119,15 @@ class Player:
                 if y > 10:
                     raise ValueError("Ship placement out of bounds")
                 self.ocean_grid[y - 1][ship.coord.x - 1] = 1
+    
+    def fire(self, coord: Coord):
+        if self.ocean_grid[coord.y - 1][coord.x - 1] == 1:  # Hit
+            self.ocean_grid[coord.y - 1][coord.x - 1] = 2
+            return True
+        else:  # Miss
+            self.ocean_grid[coord.y - 1][coord.x - 1] = -1
+            return False
+
 
 
 class Computer(Player):

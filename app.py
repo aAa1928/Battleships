@@ -31,8 +31,6 @@ def place_ship():
 
     try:
         # Update the game state with the placed ship
-        print(ship_type, position, orientation)
-
         position = Ship.convert_grid_coord(position)
 
         match ship_type:
@@ -53,6 +51,9 @@ def place_ship():
         if all(ship.is_placed for ship in [*game.player.placed_ships, *game.player.unplaced_ships]):
             game.state = GameState.PLAYING
         
+        from pprint import pp
+        pp(game.player.ocean_grid)
+
         return jsonify({
             'success': True,
             'gameState': game.state.value
