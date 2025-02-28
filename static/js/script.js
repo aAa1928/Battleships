@@ -57,6 +57,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function updateGrid() {
+    function updateGrid() {
+      fetch("/update-grid")
+        .then((response) => response.json())
+        .then((data) => {
+          const grid = data.grid;
+          const cells = oceanGrid.getElementsByTagName("td");
+
+          for (let cell of cells) {
+            if (
+              !cell.classList.contains("header-col") &&
+              !cell.classList.contains("corner")
+            ) {
+              // Remove all possible state classes
+              cell.classList.remove("ship", "hit", "miss");
+
+              // Add appropriate class based on grid value
+              switch (grid[cell.id]) {
+                case 1:
+                  cell.classList.add("ship");
+                  break;
+                case 2:
+                  cell.classList.add("hit");
+                  break;
+                case -1:
+                  cell.classList.add("miss");
+                  break;
+              }
+            }
+          }
+        })
+        .catch((error) => console.error("Error updating grid:", error));
+    }
+  }
+
   function placeShip(ship, cell) {
     // Send ship placement to server
     fetch("/place-ship", {

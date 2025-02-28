@@ -11,11 +11,9 @@ def initialize_game():
     global game
     if game is None:
         game = Game()  
-        print(game.state.value)  
 
 @app.route('/')
 def home():
-    print(game.state.value)
     return render_template('index.html', game_state=game.state.value)
 
 @app.route('/game-state')
@@ -48,11 +46,8 @@ def place_ship():
         game.player.place_ship(ship)
         
         # Check if all ships are placed
-        if all(ship.is_placed for ship in [*game.player.placed_ships, *game.player.unplaced_ships]):
+        if not game.player.unplaced_ships:
             game.state = GameState.PLAYING
-        
-        from pprint import pp
-        pp(game.player.ocean_grid)
 
         return jsonify({
             'success': True,
@@ -63,6 +58,12 @@ def place_ship():
             'success': False,
             'error': str(e)
         }), 400
+
+@app.route('/update-grid')
+def update_grid():
+    return jsonify({
+        'grid': game.player.ocean_grid
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
