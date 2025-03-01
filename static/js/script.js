@@ -69,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
         shipsContainer.style.display = "none";
         targetGrid.style.pointerEvents = "auto";
         document.getElementById("game-state").textContent = "PLAYING";
-        ships = {}; // Clear ships array
         break;
       // Add other states later
     }
@@ -238,6 +237,83 @@ document.addEventListener("DOMContentLoaded", () => {
       (id) =>
         !document.querySelector(`#ocean-grid #${id}`).classList.contains("ship")
     );
+  }
+
+  function fireTorpedo(cell) {
+    if (!validateFireTorpedo(cell)) {
+      return;
+    }
+
+    console.log("Firing torpedo at:", cell.id);
+    fetch("/update-target-grid", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        target: cell.id,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Update cell appearance based on hit/miss
+          updateTargetCell(cell, data.result);
+          // Computer's turn
+          setTimeout(() => {}, 500);
+          computerTurn();
+        }
+      })
+      .catch((error) => console.error("Error firing torpedo:", error));
+  }
+
+  function validateFireTorpedo(cell) {
+    // Check if cell is already hit or missed
+    if (cell.classList.contains("hit") || cell.classList.contains("miss")) {
+      console.error("Cell already hit or missed");
+      return false;
+    }
+
+    // Check if cell is valid
+    if (!cell.id) {
+      console.error("Invalid cell");
+      return false;
+    }
+
+    return true;
+  }
+
+  function checkGameOver() {
+    fetch("/check-game-state")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.gameOver) {
+          currentState = gameState.GAME_OVER;
+          updateUI();
+          alert(`Game Over! ${data.winner} wins!`);
+        }
+      });
+  }
+
+  function updateTargetCell(cell, result) {
+    if (result === "hit") {
+      cell.classList.add("hit");
+    } else {
+      cell.classList.add("miss");
+    }
+  }
+
+  function computerTurn() {
+    fetch("/computer-turn", {
+      method: "POST",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          updateGrid(); // Update ocean grid to show computer's shot
+        }
+      })
+      .catch((error) => console.error("Error in computer turn:", error));
   }
 
   let selectedShip = null;

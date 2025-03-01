@@ -180,6 +180,15 @@ class Computer(Player):
                     self.place_ship(ship)
                     break
 
+    def validate_fire(self, coord: Coord) -> bool:
+        try:
+            if self.ocean_grid[coord.y - 1][coord.x - 1] in [0, 1]:
+                return True
+            else:
+                return False
+        except IndexError:
+            return False
+
 
 class Game:
     def __init__(self):
