@@ -32,6 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentState = gameState.WAITING_FOR_PLAYERS;
 
   function updateGameState() {
+    updateShipList();
+    updateGrid();
     fetch("/game-state")
       .then((response) => response.json())
       .then((data) => {
@@ -68,6 +70,27 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       // Add other states later
     }
+  }
+
+  function updateShipList() {
+    fetch("/update-ship-list")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Update the local ships array based on server data
+          data.ships.forEach((serverShip) => {
+            const localShip = ships.find(
+              (ship) => ship.type === serverShip.type
+            );
+            if (localShip) {
+              localShip.placed = serverShip.placed;
+            }
+          });
+        } else {
+          console.error("Failed to get ship list:", data.error);
+        }
+      })
+      .catch((error) => console.error("Error getting ship list:", error));
   }
 
   function updateGrid() {

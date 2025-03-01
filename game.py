@@ -73,6 +73,12 @@ class Ship():
             raise ValueError("Coordinate out of bounds")
         letter = chr(ord('A') + coord.y - 1)
         return f"{letter}{coord.x}"
+    
+    def __str__(self):
+        return f"{self.type.name} at {self.coord} facing {self.orientation.name}"
+
+    def __repr__(self):
+        return f"Ship(type={self.type.name}, coord={self.coord}, orientation={self.orientation.name})"
 
 class Player:
     '''
@@ -105,7 +111,8 @@ class Player:
     def place_ship(self, ship: Ship):
         if ship.coord is None:
             raise ValueError("Ship coordinates cannot be None")
-        if ship in self.unplaced_ships:
+
+        if not ship.is_placed():
             self.unplaced_ships.remove(ship)
             self.placed_ships.append(ship)
         
