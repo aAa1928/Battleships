@@ -38,6 +38,19 @@ document.addEventListener("DOMContentLoaded", () => {
         currentState = data.state;
         console.log(`Current State Updated: ${currentState}`); // Debug log
         console.log("Ships:", ships);
+        if (currentState === gameState.PLACING_SHIPS && ships.length === 0) {
+          fetch("/update-game-state", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              state: gameState.PLAYING,
+            }),
+          }).catch((error) =>
+            console.error("Error updating game state:", error)
+          );
+        }
         updateUI();
       })
       .catch((error) => console.error("Error fetching game state:", error));

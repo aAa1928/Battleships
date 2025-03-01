@@ -142,4 +142,3 @@ class Game:
         self.player, self.opponent = self.players
         self.turn = cycle(self.players)
         self.current_player = next(self.turn)
-

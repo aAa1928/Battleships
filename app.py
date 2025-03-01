@@ -67,5 +67,14 @@ def update_grid():
         'grid': game.player.ocean_grid
     })
 
+@app.route('/update-game-state', methods=['POST'])
+def update_game_state():
+    data = request.get_json()
+    new_state = data.get('state')
+    if new_state is not None:
+        game.state = GameState(new_state)
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'error': 'No state provided'}), 400
+
 if __name__ == '__main__':
     app.run(debug=True)
