@@ -1,6 +1,6 @@
 from collections import namedtuple
 from enum import Enum
-from itertools import cycle
+from itertools import chain, cycle
 from random import randint
 
 Coord = namedtuple('Point', ['x', 'y'])
@@ -208,11 +208,14 @@ class Game:
         self.current_player = next(self.turn)
 
     def check_win(self):
-        if 1 in self.opponent.ocean_grid and 1 in self.player.ocean_grid:
+        flat_player_list = list(chain(*self.player.ocean_grid[:]))
+        flat_opponent_list = list(chain(*self.opponent.ocean_grid[:]))
+
+        if 1 in flat_opponent_list and 1 in flat_player_list:
             pass
-        elif not (1 in self.opponent.ocean_grid):
+        elif not (1 in flat_opponent_list):
             self.state = GameState.PLAYER_WON
-        elif not (1 in self.player.ocean_grid):
+        elif not (1 in flat_player_list):
             self.state = GameState.COMPUTER_WON
 
         return self.state

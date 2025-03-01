@@ -150,6 +150,7 @@ def computer_turn():
 
 @app.route('/check-game-state', methods=['GET'])
 def check_game_state():
+    game.check_win()
     if game.state == GameState.PLAYING:
         return jsonify({'game_over': False})
     elif game.state == GameState.PLAYER_WON:
@@ -159,7 +160,7 @@ def check_game_state():
     else:
         return jsonify({'game_over': False})
 
-@app.route('/reset-game', methods=['POST'])
+@app.route('/reset-game', methods=['POST']) # TODO
 def reset_game():
     global game
     try:
