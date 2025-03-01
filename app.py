@@ -18,10 +18,6 @@ def home():
 
 @app.route('/game-state')
 def get_game_state():
-    print(f'Ship list: {game.player.unplaced_ships.__len__()}')
-    print('\n')
-    print(*[unplaced_ship for unplaced_ship in game.player.unplaced_ships], sep='\n')
-    print('\n')
     return jsonify({'state': game.state.value})
 
 @app.route('/place-ship', methods=['POST'])
@@ -70,6 +66,27 @@ def update_grid():
     return jsonify({
         'grid': game.player.ocean_grid
     })
+
+@app.route('/target-grid')
+def get_target_grid():
+    return jsonify({
+        'grid': game.computer.ocean_grid
+    })
+
+@app.route('/update-target-grid', methods=['POST'])
+def update_target_grid():
+    data = request.get_json()
+    target_coord = data['target']
+    target_coord = Ship.convert_grid_coord(target_coord)
+
+    try:
+        game.computer.fire(target_coord)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
 
 @app.route('/update-game-state', methods=['POST'])
 def update_game_state():

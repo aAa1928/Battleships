@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateGameState() {
     updateShipList();
+    displaytargetGrid();
     updateGrid();
     fetch("/game-state")
       .then((response) => response.json())
@@ -67,6 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
       case gameState.PLAYING:
         shipsContainer.style.display = "none";
         targetGrid.style.pointerEvents = "auto";
+        document.getElementById("game-state").textContent = "PLAYING";
+        ships = {}; // Clear ships array
         break;
       // Add other states later
     }
@@ -91,6 +94,34 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       })
       .catch((error) => console.error("Error getting ship list:", error));
+  }
+
+  function displaytargetGrid() {
+    fetch("/update-grid")
+      .then((response) => response.json())
+      .then((data) => {
+        const grid = data.grid;
+        console.log(data.grid);
+        for (let y = 0; y < 10; y++) {
+          for (let x = 0; x < 10; x++) {
+            const letter = String.fromCharCode(65 + y);
+            const cell = document.querySelector(
+              `#target-grid #${letter}${x + 1}`
+            );
+            cell.classList.remove("hit", "miss");
+
+            switch (grid[y][x]) {
+              case 2:
+                cell.classList.add("hit");
+                break;
+              case -1:
+                cell.classList.add("miss");
+                break;
+            }
+          }
+        }
+      })
+      .catch((error) => console.error("Error updating target grid:", error));
   }
 
   function updateGrid() {
@@ -124,6 +155,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function placeShip(ship, cell) {
+    // Validate ship placement first
+    if (!validateShipPlacement(ship, cell)) {
+      console.error("Invalid ship placement");
+      return;
+    }
+
     // Send ship placement to server
     fetch("/place-ship", {
       method: "POST",
@@ -163,8 +200,44 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch((error) => console.error("Error placing ship:", error));
   }
 
-  function validateShipPlacement() {
-    // Logic to validate ship placement
+  function validateShipPlacement(ship, cell) {
+    // Extract x and y coordinates from cell ID (e.g., 'A1' -> x=1, y=1)
+    const x = parseInt(cell.id.substring(1));
+    const y = cell.id.charCodeAt(0) - 64; // 'A'=1, 'B'=2, etc.
+
+    // Check if coordinates are within bounds
+    if (x < 1 || x > 10 || y < 1 || y > 10) {
+      return false;
+    }
+
+    // Check if ship would extend beyond grid
+    if (ship.orientation === "horizontal") {
+      if (x + ship.length - 1 > 10) {
+        return false;
+      }
+    } else {
+      // vertical
+      if (y + ship.length - 1 > 10) {
+        return false;
+      }
+    }
+
+    // Check if any part of ship would overlap with existing ships
+    const checkRange =
+      ship.orientation === "horizontal"
+        ? Array.from(
+            { length: ship.length },
+            (_, i) => `${String.fromCharCode(y + 64)}${x + i}`
+          )
+        : Array.from(
+            { length: ship.length },
+            (_, i) => `${String.fromCharCode(y + i + 64)}${x}`
+          );
+
+    return checkRange.every(
+      (id) =>
+        !document.querySelector(`#ocean-grid #${id}`).classList.contains("ship")
+    );
   }
 
   let selectedShip = null;
@@ -210,6 +283,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     updateGrid();
+  });
+
+  targetGrid.addEventListener("click", (event) => {
+    if (currentState === gameState.PLAYING) {
+      const cell = event.target;
+      if (
+        !cell.id ||
+        cell.classList.contains("header-col") ||
+        cell.classList.contains("corner") ||
+        cell.classList.contains("hit") ||
+        cell.classList.contains("miss")
+      ) {
+        return;
+      }
+      fireTorpedo(cell);
+    }
   });
 
   document.addEventListener("click", (event) => {

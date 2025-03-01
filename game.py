@@ -134,12 +134,51 @@ class Player:
         else:  # Miss
             self.ocean_grid[coord.y - 1][coord.x - 1] = -1
             return False
+        
+    def validate_ship_placement(self, ship: Ship, coord: Coord) -> bool:
+        try:
+            # Check if coordinates are within bounds
+            if not (1 <= coord.x <= 10 and 1 <= coord.y <= 10):
+                return False
+
+            # Check if ship would extend beyond grid
+            if ship.orientation == Orientation.HORIZONTAL:
+                if coord.x + ship.size - 1 > 10:
+                    return False
+                check_range = [(coord.y - 1, x - 1) for x in range(coord.x, coord.x + ship.size)]
+            else:  # VERTICAL
+                if coord.y + ship.size - 1 > 10:
+                    return False
+                check_range = [(y - 1, coord.x - 1) for y in range(coord.y, coord.y + ship.size)]
+
+            # Check if any part of ship would overlap with existing ships
+            for y, x in check_range:
+                if self.ocean_grid[y][x] != 0:
+                    return False
+
+            if self.coord is None:
+                self.coord = coord
+            return True
+        except IndexError:
+            return False
 
 
 
 class Computer(Player):
     def __init__(self):
         super().__init__()
+
+    def place_ships(self):
+        for ship in self.unplaced_ships:
+            while True:
+                x = randint(1, 10)
+                y = randint(1, 10)
+                orientation = Orientation(randint(1, 2))
+                ship.coord = Coord(x, y)
+                ship.orientation = orientation
+                if self.validate_ship_placement(ship, ship.coord):
+                    self.place_ship(ship)
+                    break
 
 
 class Game:
