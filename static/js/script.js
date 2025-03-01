@@ -164,6 +164,72 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch((error) => console.error("Error updating grid:", error));
   }
 
+  function resetGame() {
+    fetch("/reset-game", {
+      method: "POST",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Reset local game state
+          currentState = data.state;
+
+          // Clear grids
+          const cells = document.querySelectorAll(
+            ".grid td:not(.header-col):not(.corner)"
+          );
+          cells.forEach((cell) => {
+            cell.classList.remove("ship", "hit", "miss");
+          });
+
+          // Reset ships container
+          shipsContainer.innerHTML = `
+                <h2>Ships</h2>
+                <ul class="ships-list">
+                    <li><div class="ship carrier" draggable="true" data-ship-length="5">
+                        <div class="ship-preview">◼◼◼◼◼</div>
+                        <p>Carrier (5)<span class="orientation-indicator">↔</span></p>
+                    </div></li>
+                    <!-- Add other ships here -->
+                </ul>
+            `;
+
+          // Reinitialize ships
+          shipElements = Array.from(document.querySelectorAll(".ship"));
+          ships = shipElements.map((shipElement) => ({
+            element: shipElement,
+            type: shipElement.classList[1],
+            length: parseInt(shipElement.dataset.shipLength),
+            placed: false,
+            orientation: "horizontal",
+            position: null,
+          }));
+
+          // Reset UI
+          updateUI();
+
+          // Reattach event listeners
+          attachEventListeners();
+
+          console.log("Game reset successfully");
+        } else {
+          console.error("Failed to reset game:", data.error);
+        }
+      })
+      .catch((error) => console.error("Error resetting game:", error));
+  }
+
+  // Add reset button event listener
+  document.getElementById("reset-game").addEventListener("click", resetGame);
+
+  // Function to reattach event listeners
+  function attachEventListeners() {
+    shipElements.forEach((shipElement) => {
+      shipElement.addEventListener("contextmenu", handleShipOrientation);
+      shipElement.addEventListener("click", handleShipSelection);
+    });
+  }
+
   function placeShip(ship, cell) {
     // Validate ship placement first
     if (!validateShipPlacement(ship, cell)) {

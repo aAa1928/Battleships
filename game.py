@@ -157,8 +157,8 @@ class Player:
                 if self.ocean_grid[y][x] != 0:
                     return False
 
-            if self.coord is None:
-                self.coord = coord
+            if ship.coord is None:
+                ship.coord = coord
             return True
         except IndexError:
             return False
@@ -208,14 +208,11 @@ class Game:
         self.current_player = next(self.turn)
 
     def check_win(self):
-        # Count hits (2) and ships (1) in each grid
-        player_hits = sum(row.count(2) for row in self.opponent.ocean_grid)
-        player_ships = sum(row.count(1) for row in self.opponent.ocean_grid)
-        computer_hits = sum(row.count(2) for row in self.player.ocean_grid)
-        computer_ships = sum(row.count(1) for row in self.player.ocean_grid)
-
-        # If all ships are hit (no 1s left), update game state
-        if player_hits > 0 and player_ships == 0:
+        if 1 in self.opponent.ocean_grid and 1 in self.player.ocean_grid:
+            pass
+        elif not (1 in self.opponent.ocean_grid):
             self.state = GameState.PLAYER_WON
-        elif computer_hits > 0 and computer_ships == 0:
+        elif not (1 in self.player.ocean_grid):
             self.state = GameState.COMPUTER_WON
+
+        return self.state

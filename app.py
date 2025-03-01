@@ -2,6 +2,7 @@ from game import Computer, Game, GameState, Orientation, Player, ShipType, Ship,
 
 from flask import Flask, render_template, request, jsonify
 
+from pprint import pp
 from random import randint
 
 app = Flask(__name__)
@@ -12,7 +13,10 @@ game = None
 def initialize_game():
     global game
     if game is None:
-        game = Game()  
+        game = Game()
+        game.opponent.place_ships()
+        if not any(game.opponent.ocean_grid):
+            raise ValueError("Opponent's ships not placed correctly.")
 
 @app.route('/')
 def home():
@@ -20,6 +24,7 @@ def home():
 
 @app.route('/game-state')
 def get_game_state():
+    pp(game.opponent.ocean_grid)
     return jsonify({'state': game.state.value})
 
 @app.route('/place-ship', methods=['POST'])
@@ -153,6 +158,22 @@ def check_game_state():
         return jsonify({'game_over': True, 'winner': 'computer'})
     else:
         return jsonify({'game_over': False})
+
+@app.route('/reset-game', methods=['POST'])
+def reset_game():
+    global game
+    try:
+        game = Game()
+        game.opponent.place_ships()
+        return jsonify({
+            'success': True,
+            'state': game.state.value
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
