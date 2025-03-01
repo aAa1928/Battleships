@@ -61,6 +61,8 @@ def place_ship():
 
 @app.route('/update-grid')
 def update_grid():
+    from pprint import pp
+    pp(game.player.ocean_grid)
     return jsonify({
         'grid': game.player.ocean_grid
     })
