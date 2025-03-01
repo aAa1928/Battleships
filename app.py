@@ -72,7 +72,7 @@ def update_grid():
 @app.route('/target-grid')
 def get_target_grid():
     return jsonify({
-        'grid': game.computer.ocean_grid
+        'grid': game.opponent.ocean_grid
     })
 
 @app.route('/update-game-state', methods=['POST'])
@@ -99,31 +99,27 @@ def get_unplaced_ships():
         'ships': unplaced_ships
     })
 
-@app.route('/update-target-grid', methods=['POST'])
+@app.route('/update-target-grid', methods=['GET', 'POST'])
 def update_target_grid():
-
-    data = request.get_json()
-
-    target_coord = Ship.convert_grid_coord(data['target'])
-    try:
-        hit = game.computer.fire(target_coord)
-        print(5)
-        # After player's turn, trigger computer's turn
-        if hit:
+    if request.method == 'POST':
+        data = request.get_json()
+        target_coord = Ship.convert_grid_coord(data['target'])
+        try:
+            hit = game.opponent.fire(target_coord)
             return jsonify({
                 'success': True,
-                'result': 'hit'
+                'result': 'hit' if hit else 'miss'
             })
-        else:
+        except Exception as e:
             return jsonify({
-                'success': True,
-                'result': 'miss'
-            })
-    except Exception as e:
+                'success': False,
+                'error': str(e)
+            }), 400
+    else:  # GET request
         return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 400
+            'success': True,
+            'grid': game.opponent.ocean_grid
+        })
 
 @app.route('/computer-turn', methods=['POST'])
 def computer_turn():
@@ -146,6 +142,17 @@ def computer_turn():
             'success': False,
             'error': str(e)
         }), 400
+
+@app.route('/check-game-state', methods=['GET'])
+def check_game_state():
+    if game.state == GameState.PLAYING:
+        return jsonify({'game_over': False})
+    elif game.state == GameState.PLAYER_WON:
+        return jsonify({'game_over': True, 'winner': 'player'})
+    elif game.state == GameState.COMPUTER_WON:
+        return jsonify({'game_over': True, 'winner': 'computer'})
+    else:
+        return jsonify({'game_over': False})
 
 if __name__ == '__main__':
     app.run(debug=True)

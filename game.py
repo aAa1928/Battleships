@@ -11,7 +11,8 @@ class GameState(Enum):
     WAITING_FOR_PLAYERS = 1
     PLACING_SHIPS = 2
     PLAYING = 3
-    GAME_OVER = 4
+    PLAYER_WON = 4
+    COMPUTER_WON = 5
 
 
 class ShipType(Enum):
@@ -180,6 +181,14 @@ class Computer(Player):
                     self.place_ship(ship)
                     break
 
+    def fire(self, coord: Coord):
+        if self.ocean_grid[coord.y - 1][coord.x - 1] == 1:  # Hit
+            self.ocean_grid[coord.y - 1][coord.x - 1] = 2
+            return True
+        else:  # Miss
+            self.ocean_grid[coord.y - 1][coord.x - 1] = -1
+            return False
+
     def validate_fire(self, coord: Coord) -> bool:
         try:
             if self.ocean_grid[coord.y - 1][coord.x - 1] in [0, 1]:
@@ -197,3 +206,16 @@ class Game:
         self.player, self.opponent = self.players
         self.turn = cycle(self.players)
         self.current_player = next(self.turn)
+
+    def check_win(self):
+        # Count hits (2) and ships (1) in each grid
+        player_hits = sum(row.count(2) for row in self.opponent.ocean_grid)
+        player_ships = sum(row.count(1) for row in self.opponent.ocean_grid)
+        computer_hits = sum(row.count(2) for row in self.player.ocean_grid)
+        computer_ships = sum(row.count(1) for row in self.player.ocean_grid)
+
+        # If all ships are hit (no 1s left), update game state
+        if player_hits > 0 and player_ships == 0:
+            self.state = GameState.PLAYER_WON
+        elif computer_hits > 0 and computer_ships == 0:
+            self.state = GameState.COMPUTER_WON

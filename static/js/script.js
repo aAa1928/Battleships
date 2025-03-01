@@ -20,7 +20,8 @@ const gameState = {
   WAITING_FOR_PLAYERS: 1,
   PLACING_SHIPS: 2,
   PLAYING: 3,
-  GAME_OVER: 4,
+  PLAYER_WON: 4,
+  COMPUTER_WON: 5,
 };
 
 const shipOrientation = {
@@ -96,31 +97,41 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function displaytargetGrid() {
-    fetch("/update-grid")
-      .then((response) => response.json())
+    fetch("/update-target-grid")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
       .then((data) => {
+        if (!data.success) {
+          throw new Error(data.error || "Failed to update target grid");
+        }
         const grid = data.grid;
-        console.log(data.grid);
         for (let y = 0; y < 10; y++) {
           for (let x = 0; x < 10; x++) {
             const letter = String.fromCharCode(65 + y);
             const cell = document.querySelector(
               `#target-grid #${letter}${x + 1}`
             );
-            cell.classList.remove("hit", "miss");
-
-            switch (grid[y][x]) {
-              case 2:
-                cell.classList.add("hit");
-                break;
-              case -1:
-                cell.classList.add("miss");
-                break;
+            if (cell) {
+              cell.classList.remove("hit", "miss");
+              switch (grid[y][x]) {
+                case 2:
+                  cell.classList.add("hit");
+                  break;
+                case -1:
+                  cell.classList.add("miss");
+                  break;
+              }
             }
           }
         }
       })
-      .catch((error) => console.error("Error updating target grid:", error));
+      .catch((error) => {
+        console.error("Error updating target grid:", error);
+      });
   }
 
   function updateGrid() {
@@ -259,8 +270,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.success) {
           // Update cell appearance based on hit/miss
           updateTargetCell(cell, data.result);
+          checkGameOver();
           // Computer's turn
-          setTimeout(() => {}, 500);
+          //   setTimeout(() => {}, 500);
           computerTurn();
         }
       })
@@ -297,8 +309,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateTargetCell(cell, result) {
     if (result === "hit") {
+      console.log(`Hit on ${cell.id}`);
       cell.classList.add("hit");
     } else {
+      console.log(`Miss on ${cell.id}`);
       cell.classList.add("miss");
     }
   }
@@ -307,10 +321,10 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("/computer-turn", {
       method: "POST",
     })
-      .then((response) => response.json())
       .then((data) => {
         if (data.success) {
           updateGrid(); // Update ocean grid to show computer's shot
+          checkGameOver();
         }
       })
       .catch((error) => console.error("Error in computer turn:", error));
