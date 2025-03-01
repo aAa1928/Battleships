@@ -57,41 +57,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function convertToGridCoordinates(cellId) {
-    const row = cellId.charAt(1) - 1; // Convert '1' to 0, '2' to 1, etc.
-    const col =
-      cellId.charAt(0).toUpperCase().charCodeAt(0) - "A".charCodeAt(0); // Convert 'A' to 0, 'B' to 1, etc.
-    return { row, col };
-  }
-
   function updateGrid() {
     fetch("/update-grid")
       .then((response) => response.json())
       .then((data) => {
         const grid = data.grid;
-        console.log("Grid Data:", grid); // Debug log
-        const cells = oceanGrid.getElementsByTagName("td");
-
-        for (let cell of cells) {
-          if (
-            !cell.classList.contains("header-col") &&
-            !cell.classList.contains("corner")
-          ) {
-            // Remove all possible state classes
+        for (let y = 0; y < 10; y++) {
+          for (let x = 0; x < 10; x++) {
+            const letter = String.fromCharCode(65 + y);
+            const cell = document.querySelector(
+              `#ocean-grid #${letter}${x + 1}`
+            );
             cell.classList.remove("ship", "hit", "miss");
 
-            const coords = convertToGridCoordinates(cell.id);
-            switch (grid[coords.row][coords.col]) {
+            switch (grid[y][x]) {
               case 1:
-                console.log("Ship found at cell:", cell.id); // Debug log
                 cell.classList.add("ship");
                 break;
               case 2:
-                console.log("Hit at cell:", cell.id); // Debug log
                 cell.classList.add("hit");
                 break;
               case -1:
-                console.log("Miss at cell:", cell.id); // Debug log
                 cell.classList.add("miss");
                 break;
             }
